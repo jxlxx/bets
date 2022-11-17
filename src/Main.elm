@@ -126,8 +126,8 @@ view model =
                            div [] [ h2 [] [text statusText]            
                                   , if List.isEmpty bets then div [] [text "none"] else div [] (viewBets bets)
                            ])
-    [Win, Loss, InProgress, NotStarted, Cancelled]
-    )
+    [Win, Loss, InProgress, NotStarted, Cancelled])
+    , createNewBet model.newBet
   ]
 
 createNewBet newBet =
