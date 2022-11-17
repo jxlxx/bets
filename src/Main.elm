@@ -49,7 +49,7 @@ init flags  =
 
 type Msg 
   = CreateBet 
-  --| DeleteBet Int
+  | DeleteBet Int
   | UpdateDescription String
   | UpdateHours Int
 
@@ -86,6 +86,10 @@ update msg model =
         }
       , Cmd.none
       )
+    DeleteBet id -> 
+      ( { model
+        | bets = List.filter ( \b -> b.id /= id ) model.bets 
+        }, Cmd.none )
   
 
 -- SUBSCRIPTIONS
@@ -96,14 +100,10 @@ subscriptions _ =
 
 view model =
   div [] [ text "Current Bets:"
-    , div [] (Bet.viewBets model.bets)
+    , div [] (viewBets model.bets)
     , createNewBet model.newBet
     ]
   
-
-viewLink path = 
-  li [] [ a [ href path ] [ text path ] ]
-
 createNewBet newBet =
   div [] 
   [ text "Description: " 
@@ -118,12 +118,41 @@ createNewBet newBet =
 
 setHours currentHours = 
   div [] 
-  [ text "time estimate: "
-  , button [onClick (UpdateHours (currentHours - 1))] 
+      [ text "time estimate: "
+      , button 
+           [onClick (UpdateHours (currentHours - 1))] 
            [text "-"] 
-  , text (String.fromInt currentHours)
-  , button [onClick (UpdateHours (currentHours + 1))] 
+      , text (String.fromInt currentHours)
+      , button 
+           [onClick (UpdateHours (currentHours + 1))] 
            [text "+"] 
+      ]
+
+
+viewBets bets = 
+  List.map viewBet bets
+
+viewBet bet =
+  span [] [
+      ul [] [ div []
+              [ text "Description: "
+              , text bet.description
+              ]
+          , div []
+              [ text "Hours: "
+              , text (String.fromInt bet.hours)
+              ]
+          , div []
+              [ text "Status: "
+              , text (Bet.decodeStatus bet.status)
+              ]
+          ],
+      betControls bet
   ]
-
-
+  
+betControls bet =
+  div [onClick (DeleteBet bet.id)]
+      [
+       text "delete"
+      ]
+  

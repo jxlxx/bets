@@ -21,38 +21,6 @@ type BetStatus
   | Cancelled
 
 
--- VIEW
-
-viewBet bet =
-    span [] [
-        ul [] [ div [] 
-                [ text "Description: "
-                , text bet.description
-                ]
-          , div [] 
-                [ text "Hours: "
-                , text (String.fromInt bet.hours)
-                ]
-          , div [] 
-                [ text "Status: "
-                , text (decodeStatus bet.status)
-                ]
-          ],
-        betControls bet
-    ]
-
-
-viewBets : List Bet -> List (Html msg)
-viewBets bets =
-    map viewBet bets
-
-
-
-betControls bet =
-    div [] [
-        text "delete"
-    ]
-
 
 decodeStatus status =
     case status of 
