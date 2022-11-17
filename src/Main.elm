@@ -131,6 +131,7 @@ view model =
                                       div [] (viewBets bets)
                            ])
     [Win, Loss, InProgress, NotStarted, Cancelled])
+    , h1 [] [ text "Create New Bet" ]
     , createNewBet model.newBet
   ]
 
