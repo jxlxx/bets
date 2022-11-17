@@ -33,11 +33,11 @@ type alias Model =
 
 init flags  = 
   ( Model [
-       {id=0, description="Make New Bets / Delete Bets", hours=1, status=Bet.InProgress}
-     , {id=1, description="Update Bet Status", hours=1, status=Bet.NotStarted}
-     , {id=2, description="Sort Bets and Display", hours=1, status=Bet.NotStarted}
+       {id=4, description="Make New Bets / Delete Bets", hours=1, status=Bet.Loss}
+     , {id=1, description="Update Bet Status", hours=1, status=Bet.Win}
+     , {id=2, description="Sort Bets and Display", hours=1, status=Bet.InProgress}
      , {id=3, description="Save to Local Storage", hours=1, status=Bet.NotStarted}
-     , {id=4, description="Nice UI (zac efron)", hours=1, status=Bet.NotStarted}
+     , {id=0, description="Nice UI (zac efron)", hours=1, status=Bet.NotStarted}
      ] 
      {description="", hours=1}
      5,
@@ -52,7 +52,7 @@ type Msg
   | DeleteBet Int
   | UpdateDescription String
   | UpdateHours Int
-
+  | SwitchStatus Int
 
 
 update msg model =
@@ -90,7 +90,24 @@ update msg model =
       ( { model
         | bets = List.filter ( \b -> b.id /= id ) model.bets 
         }, Cmd.none )
+    
+    SwitchStatus id -> 
+      ( { model
+        | bets = List.map (\b -> if b.id == id  then {b | status = (nextBetStatus b.status)} else b ) model.bets
+        }
+      , Cmd.none )
   
+
+nextBetStatus status =
+  case status of 
+    Win -> Loss
+    Loss -> Cancelled
+    Cancelled -> NotStarted
+    NotStarted -> InProgress
+    InProgress -> Win
+    
+
+
 
 -- SUBSCRIPTIONS
 subscriptions _ =
@@ -99,11 +116,20 @@ subscriptions _ =
 -- VIEW
 
 view model =
-  div [] [ text "Current Bets:"
-    , div [] (viewBets model.bets)
-    , createNewBet model.newBet
-    ]
-  
+  div []
+    [ h1 [] [text "All Bets"]
+    , div [] (List.map 
+             (\status -> let
+                           statusText = (Bet.decodeStatus status)
+                           bets = (List.filter (\b -> b.status == status) model.bets)
+                         in
+                           div [] [ h2 [] [text statusText]            
+                                  , if List.isEmpty bets then div [] [text "none"] else div [] (viewBets bets)
+                           ])
+    [Win, Loss, InProgress, NotStarted, Cancelled]
+    )
+  ]
+
 createNewBet newBet =
   div [] 
   [ text "Description: " 
@@ -142,7 +168,7 @@ viewBet bet =
               [ text "Hours: "
               , text (String.fromInt bet.hours)
               ]
-          , div []
+          , div [onClick (SwitchStatus bet.id)]
               [ text "Status: "
               , text (Bet.decodeStatus bet.status)
               ]
@@ -151,8 +177,8 @@ viewBet bet =
   ]
   
 betControls bet =
-  div [onClick (DeleteBet bet.id)]
-      [
-       text "delete"
-      ]
+  div [][ 
+     button [onClick (DeleteBet bet.id)]
+            [text "delete" ]
+    ]
   
