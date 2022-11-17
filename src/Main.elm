@@ -93,7 +93,10 @@ update msg model =
     
     SwitchStatus id -> 
       ( { model
-        | bets = List.map (\b -> if b.id == id  then {b | status = (nextBetStatus b.status)} else b ) model.bets
+        | bets = List.map (\b -> if b.id == id
+                                 then {b | status = (nextBetStatus b.status)}
+                                 else b
+                          ) model.bets
         }
       , Cmd.none )
   
