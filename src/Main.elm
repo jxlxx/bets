@@ -123,8 +123,12 @@ view model =
                            statusText = (Bet.decodeStatus status)
                            bets = (List.filter (\b -> b.status == status) model.bets)
                          in
-                           div [] [ h2 [] [text statusText]            
-                                  , if List.isEmpty bets then div [] [text "none"] else div [] (viewBets bets)
+                           div [] [ h2 [] [text statusText]
+                                  , if List.isEmpty bets
+                                    then
+                                      div [] [text "none"]
+                                    else
+                                      div [] (viewBets bets)
                            ])
     [Win, Loss, InProgress, NotStarted, Cancelled])
     , createNewBet model.newBet
